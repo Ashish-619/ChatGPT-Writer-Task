@@ -1,14 +1,14 @@
-// Importing necessary assets (icons) for the extension UI
+// Importing necessary icons for the extension UI
 import editIcon from "~/assets/edit.svg";
 import insertIcon from "~/assets/insert.svg";
 import generateIcon from "~/assets/generate.svg";
 import regenerateIcon from "~/assets/regenerate.svg";
 
-// Main content script definition, targeting LinkedIn pages
+// Define content script for LinkedIn pages
 export default defineContentScript({
-  matches: ["*://*.linkedin.com/*"], // Matches LinkedIn domain URLs
+  matches: ["*://*.linkedin.com/*"], // Match LinkedIn URLs
   main() {
-    // HTML template for the custom modal that will be injected into the page
+    // HTML structure for the custom modal
     const modalHtml = `
       <div id="custom-modal" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 4000;">
         <div id="modal-content" style="background: white; border-radius: 8px; width: 100%; max-width: 570px; padding: 20px;">
@@ -30,30 +30,30 @@ export default defineContentScript({
       </div>
     `;
 
-    // Append the modal to the end of the document body
+    // Append the modal to the document body
     document.body.insertAdjacentHTML("beforeend", modalHtml);
 
-    // Cache modal elements for later use
+    // Cache modal elements for easy access
     const modal = document.getElementById("custom-modal") as HTMLDivElement;
     const generateBtn = document.getElementById("generate-btn") as HTMLButtonElement;
     const insertBtn = document.getElementById("insert-btn") as HTMLButtonElement;
     const inputText = document.getElementById("input-text") as HTMLInputElement;
     const messagesDiv = document.getElementById("messages") as HTMLDivElement;
 
-    // Store the last generated message and reference to the parent element
+    // Store the last generated message and parent element reference
     let lastGeneratedMessage = "";
     let parentElement: HTMLElement | null = null;
 
-    // Event listener to detect clicks on LinkedIn message input areas
+    // Event listener for clicks on LinkedIn message input areas
     document.addEventListener("click", (event: MouseEvent) => {
       const target = event.target as HTMLElement;
 
-      // Check if clicked element is a message input area
+      // Identify if the clicked element is a message input area
       if (
         target.matches(".msg-form__contenteditable") ||
         target.closest(".msg-form__contenteditable")
       ) {
-        // Store the parent container of the message input area
+        // Save the parent container of the message input area
         parentElement =
           target.closest(".msg-form__container") ||
           target.closest(".msg-form__contenteditable");
@@ -62,7 +62,7 @@ export default defineContentScript({
           ".msg-form_msg-content-container"
         );
 
-        // Ensure the message form is active and focused
+        // Ensure the message form is active
         if (parentElement && contentContainer) {
           contentContainer.classList.add(
             "msg-form_msg-content-container--is-active"
@@ -70,7 +70,7 @@ export default defineContentScript({
           parentElement.setAttribute("data-artdeco-is-focused", "true");
         }
 
-        // If the edit icon hasn't been added yet, inject it
+        // Inject the edit icon if it hasn't been added
         if (parentElement && !parentElement.querySelector(".edit-icon")) {
           parentElement.style.position = "relative";
 
@@ -87,7 +87,7 @@ export default defineContentScript({
           icon.style.zIndex = "1000";
           parentElement.appendChild(icon);
 
-          // Open the modal when the edit icon is clicked
+          // Open the modal on clicking the edit icon
           icon.addEventListener("click", (e) => {
             e.stopPropagation();
             modal.style.display = "flex";
@@ -101,12 +101,12 @@ export default defineContentScript({
       const messages = [
         "Thank you for the opportunity! If you have any more questions or if there's anything else I can help you with, feel free to ask.",
       ];
-      return messages[0]; // Return a fixed generated message
+      return messages[0]; // Return a fixed message
     };
 
     // Event listener for the 'Generate' button
     generateBtn.addEventListener("click", (e) => {
-      e.stopPropagation(); // Prevent bubbling up to the document
+      e.stopPropagation(); // Prevent event bubbling
 
       // Get the user input
       const inputValue = inputText.value.trim();
@@ -133,7 +133,7 @@ export default defineContentScript({
       generateBtn.textContent = "Loading...";
       generateBtn.style.backgroundColor = "#666D80";
 
-      // Simulate an API call with a timeout to generate a message
+      // Simulate API call with a timeout to generate a message
       setTimeout(() => {
         lastGeneratedMessage = generateMessage(); // Get the generated message
         const generatedMessageDiv = document.createElement("div");
@@ -150,11 +150,11 @@ export default defineContentScript({
           marginRight: "auto",
         });
 
-        // Add generated message to the messages div
+        // Add the generated message to the messages div
         messagesDiv.appendChild(generatedMessageDiv);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight; // Scroll to the bottom
+        messagesDiv.scrollTop = messagesDiv.scrollHeight; // Scroll to bottom
 
-        // Enable the generate button and change text to 'Regenerate'
+        // Enable the generate button and update its text to 'Regenerate'
         generateBtn.disabled = false;
         generateBtn.style.backgroundColor = "#007bff";
         generateBtn.style.color = "white";
@@ -166,10 +166,10 @@ export default defineContentScript({
       }, 500);
     });
 
-    // Event listener for the 'Insert' button to insert the generated message into the message input area
+    // Event listener for the 'Insert' button to insert the generated message into the input area
     insertBtn.addEventListener("click", () => {
       if (lastGeneratedMessage && parentElement) {
-        // Remove aria-label to avoid any screen reader issues
+        // Remove aria-label to avoid screen reader issues
         parentElement.removeAttribute("aria-label");
 
         // Find or create a <p> tag inside the contenteditable area
@@ -190,7 +190,7 @@ export default defineContentScript({
         // Hide the placeholder text
         const placeholder = parentElement.querySelector(".msg-form__placeholder");
         if (placeholder) {
-          placeholder.style.display = "none"; // Hide the placeholder
+          placeholder.style.display = "none"; // Hide placeholder
         }
 
         // Trigger input event to update any potential listeners
@@ -198,14 +198,14 @@ export default defineContentScript({
           bubbles: true,
           cancelable: true,
         });
-        existingParagraph.dispatchEvent(inputEvent); // Dispatch input event for any listeners
+        existingParagraph.dispatchEvent(inputEvent); // Dispatch input event
       }
     });
 
-    // Ensure focus is removed from the modal when clicking outside of it
+    // Close the modal when clicking outside of it
     modal.addEventListener("click", (e) => {
       if (e.target === modal) {
-        modal.style.display = "none"; // Close the modal
+        modal.style.display = "none"; // Close modal
       }
     });
   },
