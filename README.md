@@ -17,6 +17,9 @@ ChatGPT Writer is an AI-powered writing assistant designed to enhance your writi
 3. **Regenerate Responses:**  
    - Users have the option to regenerate responses multiple times for varied output.
 
+## Extension 
+![image](https://github.com/user-attachments/assets/78451aee-750b-4c69-91fa-186b4591f77f)
+
 ## Demo Video
 [ChatGPT-Writer-Task-Video.webm](https://github.com/user-attachments/assets/06a29e3d-5bd7-45e2-b1e9-9949c9f59c97)
 
